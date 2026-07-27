@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+src/local_files_agent/__init__.py
+src/local_files_agent.egg-info/PKG-INFO
+src/local_files_agent.egg-info/SOURCES.txt
+src/local_files_agent.egg-info/dependency_links.txt
+src/local_files_agent.egg-info/requires.txt
+src/local_files_agent.egg-info/top_level.txt
+src/local_files_agent/virtual_fs/__init__.py
+src/local_files_agent/virtual_fs/exceptions.py
+src/local_files_agent/virtual_fs/models.py
+tests/test_virtual_fs.py
