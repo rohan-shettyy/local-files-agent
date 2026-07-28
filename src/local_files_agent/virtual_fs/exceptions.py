@@ -40,3 +40,19 @@ class ReadOnlyError(VirtualFSError):
     """Raised when attempting to modify a read-only node or directory."""
     pass
 
+
+class SnapshotError(VirtualFSError):
+    """Base exception for virtual filesystem snapshot errors."""
+    pass
+
+
+class SnapshotNotFoundError(SnapshotError):
+    """Raised when a requested snapshot ID is not found in the manager."""
+    pass
+
+
+class InvalidSnapshotError(SnapshotError):
+    """Raised when snapshot data is malformed or invalid."""
+    pass
+
+

@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from local_files_agent.virtual_fs.exceptions import (
@@ -629,4 +629,121 @@ class VirtualTree(BaseModel):
     def from_dict(cls, data: dict) -> "VirtualTree":
         """Deserialize VirtualTree from dictionary representation."""
         return cls.model_validate(data)
+
+    def to_json_tree(
+        self,
+        path: str = "/",
+        include_metadata: bool = True,
+        include_contents: bool = True,
+        max_content_length: Optional[int] = None,
+        max_depth: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Format VirtualTree state into structured JSON observation dictionary."""
+        from local_files_agent.virtual_fs.formatter import OutputFormatter
+        return OutputFormatter.format_tree_json(
+            self,
+            path=path,
+            include_metadata=include_metadata,
+            include_contents=include_contents,
+            max_content_length=max_content_length,
+            max_depth=max_depth,
+        )
+
+    def to_text_tree(
+        self,
+        path: str = "/",
+        max_depth: Optional[int] = None,
+        show_metadata: bool = True,
+    ) -> str:
+        """Format VirtualTree state into ASCII tree diagram string observation."""
+        from local_files_agent.virtual_fs.formatter import OutputFormatter
+        return OutputFormatter.format_tree_text(
+            self,
+            path=path,
+            max_depth=max_depth,
+            show_metadata=show_metadata,
+        )
+
+    def format_observation(
+        self,
+        action: Union[str, Dict[str, Any]],
+        success: bool,
+        output: Optional[Union[str, Dict[str, Any]]] = None,
+        error: Optional[str] = None,
+        path: str = "/",
+        **kwargs: Any,
+    ):
+        """Format action execution result alongside VirtualTree observation payload."""
+        from local_files_agent.virtual_fs.formatter import OutputFormatter
+        return OutputFormatter.format_action_result(
+            action=action,
+            success=success,
+            output=output,
+            error=error,
+            tree=self,
+            path=path,
+            **kwargs,
+        )
+
+    def clone(self) -> "VirtualTree":
+        """
+        Create a deep copy of this VirtualTree instance.
+
+        Returns:
+            New, isolated VirtualTree instance.
+        """
+        return VirtualTree.from_dict(self.to_dict())
+
+    def snapshot(
+        self,
+        snapshot_id: Optional[str] = None,
+        label: Optional[str] = None,
+    ):
+        """
+        Create a TreeSnapshot of this VirtualTree instance.
+
+        Returns:
+            TreeSnapshot instance.
+        """
+        from local_files_agent.virtual_fs.snapshot import TreeSnapshot
+        return TreeSnapshot.create(self, snapshot_id=snapshot_id, label=label)
+
+    def restore_from_snapshot(self, snapshot: Any) -> "VirtualTree":
+        """
+        Restore in-place this VirtualTree instance from a TreeSnapshot or dict.
+
+        Args:
+            snapshot: TreeSnapshot instance or dictionary representation.
+
+        Returns:
+            Self (modified in-place).
+        """
+        from local_files_agent.virtual_fs.snapshot import TreeSnapshot
+        if isinstance(snapshot, dict):
+            restored_tree = VirtualTree.from_dict(snapshot)
+        elif isinstance(snapshot, TreeSnapshot):
+            restored_tree = snapshot.restore()
+        elif hasattr(snapshot, "restore"):
+            restored_tree = snapshot.restore()
+        else:
+            raise ValueError(f"Cannot restore from invalid snapshot type: {type(snapshot)}")
+
+        self.root = restored_tree.root
+        self.max_depth = restored_tree.max_depth
+        return self
+
+    def diff(self, other_tree: "VirtualTree"):
+        """
+        Compute diff between this tree and another VirtualTree.
+
+        Args:
+            other_tree: Target VirtualTree to compare against self.
+
+        Returns:
+            TreeDiff instance.
+        """
+        from local_files_agent.virtual_fs.snapshot import diff_trees
+        return diff_trees(self, other_tree)
+
+
 
