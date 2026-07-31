@@ -1,5 +1,14 @@
 """Local Filesystem Agent package for RL Fine-Tuning Environment."""
 
+from local_files_agent.generator import (
+    GeneratorError,
+    NoiseTreeConfig,
+    NoiseTreeGenerator,
+    TargetFileInfo,
+    TreeGenerationError,
+    UnorganizedTreeOutput,
+    generate_unorganized_tree,
+)
 from local_files_agent.policy import (
     PolicyConfig,
     PolicyError,
@@ -16,4 +25,12 @@ __all__ = [
     "PolicyValidationError",
     "PolicyViolationError",
     "PolicyValidator",
+    "NoiseTreeConfig",
+    "TargetFileInfo",
+    "UnorganizedTreeOutput",
+    "GeneratorError",
+    "TreeGenerationError",
+    "NoiseTreeGenerator",
+    "generate_unorganized_tree",
 ]
+
