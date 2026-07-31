@@ -6,8 +6,21 @@ from local_files_agent.generator.config import (
     UnorganizedTreeOutput,
 )
 from local_files_agent.generator.exceptions import (
+    DatasetExportError,
+    DatasetValidationError,
     GeneratorError,
     TreeGenerationError,
+)
+from local_files_agent.generator.exporter import (
+    DatasetExporter,
+    DatasetManifest,
+    DatasetValidator,
+    ShardMetadata,
+    SplitMetadata,
+    ValidationResult,
+    export_dataset,
+    load_sharded_dataset,
+    validate_dataset,
 )
 from local_files_agent.generator.noise_tree import (
     NoiseTreeGenerator,
@@ -24,8 +37,20 @@ __all__ = [
     "UnorganizedTreeOutput",
     "GeneratorError",
     "TreeGenerationError",
+    "DatasetValidationError",
+    "DatasetExportError",
     "NoiseTreeGenerator",
     "generate_unorganized_tree",
     "generate_synthetic_prompt",
     "generate_dataset_batch",
+    "DatasetValidator",
+    "DatasetExporter",
+    "DatasetManifest",
+    "ShardMetadata",
+    "SplitMetadata",
+    "ValidationResult",
+    "export_dataset",
+    "load_sharded_dataset",
+    "validate_dataset",
 ]
+

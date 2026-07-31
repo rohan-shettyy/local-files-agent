@@ -5,8 +5,9 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
-from local_files_agent.generator.config import UnorganizedTreeOutput
+from local_files_agent.generator.config import TargetFileInfo, UnorganizedTreeOutput
 from local_files_agent.policy.models import PolicyConfig
+from local_files_agent.virtual_fs.models import VirtualTree
 
 
 class PromptPersona(str, Enum):
@@ -79,6 +80,7 @@ class SyntheticPromptSample(BaseModel):
             "metadata": self.metadata,
         }
         if self.unorganized_tree_output is not None:
+            data["tree"] = self.unorganized_tree_output.tree.to_dict()
             data["target_files"] = [
                 tf.model_dump() for tf in self.unorganized_tree_output.target_files
             ]
@@ -96,12 +98,36 @@ class SyntheticPromptSample(BaseModel):
         policy_data = data.get("policy", {})
         policy = PolicyConfig.from_dict(policy_data) if isinstance(policy_data, dict) else policy_data
 
+        unorganized_tree_output = None
+        if "tree" in data or "unorganized_tree_output" in data:
+            tree_raw = data.get("tree")
+            if tree_raw is None and isinstance(data.get("unorganized_tree_output"), dict):
+                tree_raw = data["unorganized_tree_output"].get("tree")
+
+            if tree_raw is not None:
+                v_tree = VirtualTree.from_dict(tree_raw) if isinstance(tree_raw, dict) else tree_raw
+                target_files = [
+                    TargetFileInfo.model_validate(tf) if isinstance(tf, dict) else tf
+                    for tf in data.get("target_files", [])
+                ]
+                noise_files = data.get("noise_files", [])
+                forbidden_files = data.get("forbidden_files", [])
+                unorganized_tree_output = UnorganizedTreeOutput(
+                    tree=v_tree,
+                    policy=policy,
+                    target_files=target_files,
+                    noise_files=noise_files,
+                    forbidden_files=forbidden_files,
+                )
+
         return cls(
             prompt=data["prompt"],
             policy=policy,
             persona=data.get("persona", "casual"),
+            unorganized_tree_output=unorganized_tree_output,
             metadata=data.get("metadata", {}),
         )
+
 
     @classmethod
     def from_json(cls, json_str: str) -> "SyntheticPromptSample":

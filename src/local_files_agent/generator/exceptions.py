@@ -8,3 +8,14 @@ class GeneratorError(Exception):
 class TreeGenerationError(GeneratorError):
     """Raised when virtual filesystem tree generation fails."""
     pass
+
+
+class DatasetValidationError(GeneratorError):
+    """Raised when synthetic dataset validation fails."""
+    pass
+
+
+class DatasetExportError(GeneratorError):
+    """Raised when dataset sharding or export fails."""
+    pass
+
