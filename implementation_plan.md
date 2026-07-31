@@ -21,7 +21,7 @@ This project aims to build a modular reinforcement learning (RL) fine-tuning env
 > 1. **Base Model Selection**: Do you have a preferred 1B model family (e.g., Llama-3.2-1B, Qwen2.5-0.5B/1.5B, DeepSeek-R1-Distill-Qwen-1.5B, or SmolLM2-1.7B)?
 > 2. **RL Framework Preference**: Do you prefer using **GRPO** (Group Relative Policy Optimization - popular in DeepSeek R1 style reasoning/tool fine-tuning, no separate critic model required) or standard **PPO** / **DPO**?
 > 3. **Tree State Format & Action Protocol**: For tool actions, should the agent output structured JSON tool calls (e.g. `{"action": "read", "path": "file.txt"}`), or bash-like text commands (e.g., `cat file.txt`)?
-> 4. **Teacher LLM for Prompt Generation**: Will prompt generation be driven by an external API (e.g. Claude / OpenAI / Gemini API) or a larger local model (e.g., Qwen2.5-72B / Llama3.3-70B)?
+> 4. **Teacher LLM for Prompt Generation**: Uses a free API tier such as **Gemini 2.5 Flash** / **Gemini 3.5 Flash** (via Google AI Studio) to avoid API costs during synthetic dataset generation, or alternatively a local open-weight model.
 
 ---
 
@@ -63,7 +63,7 @@ Linear Project: **RL Fine-Tuning Environment for Local LLM (Filesystem Agent)**
     }
     ```
   - Unorganized filesystem tree generator (populating random noise files, mislocated documents, system files).
-  - Synthesizer script connecting with teacher LLM to generate diverse user intent prompts.
+  - Synthesizer script connecting with a teacher LLM (using free API tiers like `gemini-2.5-flash` / `gemini-3.5-flash` via Google AI Studio to avoid API costs) to generate diverse user intent prompts.
 
 ---
 
